@@ -68,7 +68,6 @@ requirements-dev.txt
 *_GUIDE.md
 database.md
 er.md
-*.txt
 
 # 開発設定
 .env.sample
