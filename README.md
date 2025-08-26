@@ -28,7 +28,7 @@ pip install -r requirements.txt
 
 ### 2. 環境変数の設定
 ```bash
-cp .env.example .env
+cp .env
 # .envファイルを編集して実際の値を設定
 ```
 
