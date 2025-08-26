@@ -19,6 +19,7 @@ class VaccinationService:
         """予防接種記録を作成"""
         vaccination_dict = vaccination_data.model_dump()
         vaccination_dict["id"] = str(uuid.uuid4())
+        vaccination_dict["created_at"] = datetime.now()  # created_atを明示的に設定
         
         db_vaccination = Vaccination(**vaccination_dict)
         self.db.add(db_vaccination)

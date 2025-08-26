@@ -32,8 +32,8 @@ class HealthRecord(Base):
 
     # Indexes - Updated for Azure MySQL schema
     __table_args__ = (
-        Index('ix_health_records_dog_id', 'dog_id'),
-        Index('ix_health_records_record_date', 'record_date'),
-        Index('ix_health_records_dog_date', 'dog_id', 'record_date'),
+        Index('ix_健康記録_dog_id', 'dog_id'),
+        Index('ix_健康記録_record_date', 'record_date'),
+        Index('ix_健康記録_dog_date', 'dog_id', 'record_date'),
         # Note: removed author_user_id index as column doesn't exist in Azure MySQL
     )

@@ -7,9 +7,7 @@ import math
 from app.core.deps import get_db, get_current_active_user
 from app.models.user import User, UserRole
 from app.models.walk_event import WalkEvent
-from app.models.walk_report import WalkReport, ReportStatus
 from app.schemas.walk_event import WalkEventCreate, WalkEventUpdate, WalkEventOut, WalkEventListResponse
-from app.schemas.walk_report import WalkReportListResponse
 
 router = APIRouter()
 
@@ -143,49 +141,3 @@ def update_walk_event(
     return event
 
 
-@router.get("/{event_id}/reports", response_model=WalkReportListResponse)
-def list_event_reports(
-    event_id: str,
-    current_user: User = Depends(get_current_active_user),
-    db: Session = Depends(get_db),
-    page: int = Query(1, ge=1),
-    size: int = Query(10, ge=1, le=100)
-):
-    # Check if event exists
-    event = db.query(WalkEvent).filter(WalkEvent.id == event_id).first()
-    if not event:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Walk event not found"
-        )
-    
-    query = db.query(WalkReport).filter(WalkReport.walk_event_id == event_id)
-    
-    # Apply visibility filter based on user permissions
-    if current_user.role not in [UserRole.ADMIN, UserRole.SUPER_ADMIN]:
-        # Regular users see public reports + their own reports
-        query = query.filter(
-            (WalkReport.status == ReportStatus.PUBLIC) | 
-            (WalkReport.author_user_id == current_user.id)
-        )
-    
-    # Order by creation date descending
-    query = query.order_by(WalkReport.created_at.desc())
-    
-    # Get total count
-    total = query.count()
-    
-    # Apply pagination
-    offset = (page - 1) * size
-    reports = query.offset(offset).limit(size).all()
-    
-    # Calculate total pages
-    pages = math.ceil(total / size) if total > 0 else 1
-    
-    return WalkReportListResponse(
-        items=reports,
-        total=total,
-        page=page,
-        size=size,
-        pages=pages
-    )

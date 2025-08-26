@@ -80,3 +80,8 @@ claude-code-settings/
 scripts/
 comprehensive_test_results.json
 database_correction_plan.json
+.env
+__pycache__/
+*.pyc
+.env.*
+.alembic/*

@@ -25,7 +25,6 @@ from app.models.notification import Notification
 # Event models (depend on User, Owner, Dog)
 from app.models.walk_event import WalkEvent
 from app.models.walk_participant import WalkParticipant
-from app.models.walk_report import WalkReport
 
 # Medical/certificate models (standalone)
 from app.models.vaccination import Vaccination
@@ -46,7 +45,7 @@ __all__ = [
     "Post", "Comment", "Like", "Notification",
     
     # Events
-    "WalkEvent", "WalkParticipant", "WalkReport",
+    "WalkEvent", "WalkParticipant",
     
     # Medical/certificates
     "Vaccination", "ParasitePrevention", "Certificate"

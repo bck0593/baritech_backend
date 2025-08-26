@@ -32,7 +32,7 @@ class CertificateUpdate(BaseModel):
 class CertificateOut(BaseModel):
     id: str
     dog_id: str
-    cert_type: str  # ENUMから文字列に変更
+    cert_type: str
     cert_number: Optional[str] = None
     issuer: str
     issued_on: date
@@ -43,3 +43,23 @@ class CertificateOut(BaseModel):
 
     class Config:
         from_attributes = True
+        
+    @classmethod
+    def model_validate(cls, obj):
+        # cert_typeがEnumの場合、その値を文字列に変換
+        if hasattr(obj, 'cert_type') and hasattr(obj.cert_type, 'value'):
+            data = {
+                'id': obj.id,
+                'dog_id': obj.dog_id,
+                'cert_type': obj.cert_type.value,  # Enum.value を取得
+                'cert_number': obj.cert_number,
+                'issuer': obj.issuer,
+                'issued_on': obj.issued_on,
+                'expires_on': obj.expires_on,
+                'file_url': obj.file_url,
+                'notes': obj.notes,
+                'created_at': obj.created_at,
+            }
+            return cls(**data)
+        else:
+            return super().model_validate(obj)

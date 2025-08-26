@@ -5,7 +5,7 @@ from app.db.session import Base
 
 
 class Vaccination(Base):
-    __tablename__ = "vaccinations"
+    __tablename__ = "予防接種"
     
     id = Column(String(255), primary_key=True)
     dog_id = Column(String(255), nullable=False, index=True)  # FK to dogs.id
@@ -17,10 +17,10 @@ class Vaccination(Base):
     notes = Column(Text, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     
-    # ���ï�database.mdn4.2������n���ï���	
+    # database.md 4.2節のインデックス設計に基づく
     __table_args__ = (
-        Index('ix_vaccinations_dog_id', 'dog_id'),
-        Index('ix_vaccinations_vaccine_name', 'vaccine_name'),
-        Index('ix_vaccinations_administered_on', 'administered_on'),
-        Index('ix_vaccinations_next_due_on', 'next_due_on'),
+        Index('ix_予防接種_dog_id', 'dog_id'),
+        Index('ix_予防接種_vaccine_name', 'vaccine_name'),
+        Index('ix_予防接種_administered_on', 'administered_on'),
+        Index('ix_予防接種_next_due_on', 'next_due_on'),
     )

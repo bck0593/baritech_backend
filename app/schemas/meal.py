@@ -1,6 +1,6 @@
 from datetime import datetime
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 from decimal import Decimal
 
 from app.models.meal import MealType
@@ -21,8 +21,14 @@ class MealCreate(MealBase):
 class MealOut(MealBase):
     id: str
     dog_id: str
-    created_at: datetime
-    updated_at: datetime
 
     class Config:
         from_attributes = True
+
+
+class MealListResponse(BaseModel):
+    items: List[MealOut]
+    total: int
+    page: int
+    size: int
+    pages: int

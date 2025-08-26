@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date
 from pydantic import BaseModel
 from typing import Optional, List
 
@@ -20,8 +20,6 @@ class DiaryEntryOut(DiaryEntryBase):
     id: str
     dog_id: str
     author_user_id: str
-    created_at: datetime
-    updated_at: datetime
 
     class Config:
         from_attributes = True

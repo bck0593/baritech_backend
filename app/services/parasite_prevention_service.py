@@ -19,6 +19,7 @@ class ParasitePreventionService:
         """寄生虫予防記録を作成"""
         prevention_dict = prevention_data.model_dump()
         prevention_dict["id"] = str(uuid.uuid4())
+        prevention_dict["created_at"] = datetime.now()  # created_atを明示的に設定
         
         db_prevention = ParasitePrevention(**prevention_dict)
         self.db.add(db_prevention)

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Date, DateTime, Enum, Index
+from sqlalchemy import Column, String, Date, DateTime, Enum, Index, Text
 from datetime import datetime
 import enum
 
@@ -14,7 +14,7 @@ class CertificateType(enum.Enum):
 
 
 class Certificate(Base):
-    __tablename__ = "certificates"
+    __tablename__ = "証明書"
 
     id = Column(String(255), primary_key=True)
     dog_id = Column(String(255), nullable=False, index=True)
@@ -24,13 +24,13 @@ class Certificate(Base):
     issued_on = Column(Date, nullable=False)
     expires_on = Column(Date, nullable=True)
     file_url = Column(String(500), nullable=True)
-    notes = Column(String(1000), nullable=True)
+    notes = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
     # Indexes for performance
     __table_args__ = (
-        Index('ix_certificates_dog_id', 'dog_id'),
-        Index('ix_certificates_cert_type', 'cert_type'),
-        Index('ix_certificates_issued_on', 'issued_on'),
-        Index('ix_certificates_expires_on', 'expires_on'),
+        Index('ix_証明書_dog_id', 'dog_id'),
+        Index('ix_証明書_cert_type', 'cert_type'),
+        Index('ix_証明書_issued_on', 'issued_on'),
+        Index('ix_証明書_expires_on', 'expires_on'),
     )

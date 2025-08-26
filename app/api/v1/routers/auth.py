@@ -46,7 +46,24 @@ def register_user(user_create: UserCreate, db: Session = Depends(get_db)):
 @router.post("/login", response_model=Token)
 def login_user(user_login: UserLogin, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == user_login.email).first()
-    if not user or not verify_password(user_login.password, user.hashed_password):
+    
+    # Check if user exists
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect email or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    # Check if hashed_password exists and is not empty
+    if not user.hashed_password or not user.hashed_password.strip():
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Account configuration error. Please contact administrator."
+        )
+    
+    # Verify password
+    if not verify_password(user_login.password, user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password",

@@ -9,7 +9,7 @@ from app.models.user import User, UserRole
 from app.models.meal import Meal
 from app.models.dog import Dog
 from app.models.owner import Owner
-from app.schemas.meal import MealCreate, MealOut
+from app.schemas.meal import MealCreate, MealOut, MealListResponse
 
 router = APIRouter()
 
@@ -69,7 +69,7 @@ def create_meal(
     return db_meal
 
 
-@router.get("/")
+@router.get("/", response_model=MealListResponse)
 def list_meals(
     current_user: User = Depends(get_current_active_user),
     db: Session = Depends(get_db),
@@ -85,7 +85,7 @@ def list_meals(
     if current_user.role == UserRole.USER:
         user_dogs = get_user_dogs(db, current_user)
         if not user_dogs:
-            return {"items": [], "total": 0, "page": page, "size": size, "pages": 1}
+            return MealListResponse(items=[], total=0, page=page, size=size, pages=1)
         
         dog_ids = [dog.id for dog in user_dogs]
         query = query.filter(Meal.dog_id.in_(dog_ids))
@@ -119,13 +119,13 @@ def list_meals(
     # Calculate total pages
     pages = math.ceil(total / size) if total > 0 else 1
     
-    return {
-        "items": meals,
-        "total": total,
-        "page": page,
-        "size": size,
-        "pages": pages
-    }
+    return MealListResponse(
+        items=meals,
+        total=total,
+        page=page,
+        size=size,
+        pages=pages
+    )
 
 
 @router.get("/{meal_id}", response_model=MealOut)

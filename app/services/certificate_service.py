@@ -5,37 +5,39 @@ from sqlalchemy.orm import Session
 from sqlalchemy import and_, or_
 
 from app.models.certificate import Certificate
-from app.schemas.certificate import CertificateCreate, CertificateUpdate
-from app.schemas.common import PaginatedResponse
+from app.schemas.certificate import CertificateCreate, CertificateUpdate, CertificateOut
+from app.core.pagination import PaginatedResponse, paginate_query
 
 
-def create_certificate(db: Session, certificate: CertificateCreate) -> Certificate:
+def create_certificate(db: Session, certificate: CertificateCreate) -> CertificateOut:
     """Create new certificate."""
-    db_certificate = Certificate(
-        id=str(uuid4()),
-        **certificate.model_dump()
-    )
+    certificate_dict = certificate.model_dump()
+    certificate_dict["id"] = str(uuid4())
+    certificate_dict["created_at"] = datetime.now()  # created_atを明示的に設定
+    
+    db_certificate = Certificate(**certificate_dict)
     db.add(db_certificate)
     db.commit()
     db.refresh(db_certificate)
-    return db_certificate
+    return CertificateOut.model_validate(db_certificate)
 
 
-def get_certificate(db: Session, certificate_id: str) -> Optional[Certificate]:
+def get_certificate(db: Session, certificate_id: str) -> Optional[CertificateOut]:
     """Get certificate by ID."""
-    return db.query(Certificate).filter(Certificate.id == certificate_id).first()
+    certificate = db.query(Certificate).filter(Certificate.id == certificate_id).first()
+    return CertificateOut.model_validate(certificate) if certificate else None
 
 
 def get_certificates(
     db: Session,
-    skip: int = 0,
-    limit: int = 100,
+    page: int = 1,
+    page_size: int = 10,
     dog_id: Optional[str] = None,
     cert_type: Optional[str] = None,
     issuer: Optional[str] = None,
     expires_after: Optional[str] = None,
     expires_before: Optional[str] = None
-) -> PaginatedResponse:
+) -> PaginatedResponse[CertificateOut]:
     """Get certificates with filtering and pagination."""
     query = db.query(Certificate)
     
@@ -55,25 +57,11 @@ def get_certificates(
     if expires_before:
         query = query.filter(Certificate.expires_on <= expires_before)
     
-    # Get total count
-    total = query.count()
-    
-    # Apply pagination
-    items = query.offset(skip).limit(limit).all()
-    
-    pages = (total + limit - 1) // limit if limit > 0 else 1
-    page = (skip // limit) + 1 if limit > 0 else 1
-    
-    return PaginatedResponse(
-        items=items,
-        total=total,
-        page=page,
-        per_page=limit,
-        pages=pages
-    )
+    # Use paginate_query function like other services
+    return paginate_query(query, page, page_size, CertificateOut)
 
 
-def update_certificate(db: Session, certificate_id: str, certificate: CertificateUpdate) -> Certificate:
+def update_certificate(db: Session, certificate_id: str, certificate: CertificateUpdate) -> Optional[CertificateOut]:
     """Update certificate."""
     db_certificate = db.query(Certificate).filter(Certificate.id == certificate_id).first()
     if not db_certificate:
@@ -85,7 +73,7 @@ def update_certificate(db: Session, certificate_id: str, certificate: Certificat
     
     db.commit()
     db.refresh(db_certificate)
-    return db_certificate
+    return CertificateOut.model_validate(db_certificate)
 
 
 def delete_certificate(db: Session, certificate_id: str) -> bool:
