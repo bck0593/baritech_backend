@@ -1,10 +1,11 @@
 from fastapi import APIRouter
 
-from app.api.v1.routers import auth, dogs, bookings, diary_entries, health_records, meals, walk_events, walk_participants, dog_evaluations, posts, comments, likes, notifications, vaccinations, parasite_preventions, certificates
+from app.api.v1.routers import auth, dogs, bookings, diary_entries, health_records, meals, walk_events, walk_participants, dog_evaluations, posts, comments, likes, notifications, vaccinations, parasite_preventions, certificates, owners
 
 api_router = APIRouter()
 
 api_router.include_router(auth.router, prefix="/auth", tags=["auth"])
+api_router.include_router(owners.router, prefix="/owners", tags=["owners"])
 api_router.include_router(dogs.router, prefix="/dogs", tags=["dogs"])
 api_router.include_router(bookings.router, prefix="/bookings", tags=["bookings"])
 api_router.include_router(diary_entries.router, prefix="/diary-entries", tags=["diary-entries"])

@@ -6,11 +6,19 @@ from typing import Generator
 
 from app.core.config import settings
 
-# Configure connect_args for SQLite
-url = make_url(settings.DATABASE_URL)
+# Configure connect_args for different databases
 connect_args = {}
-if url.get_backend_name().startswith("sqlite"):
+
+# Parse URL to determine database type
+if "sqlite" in settings.DATABASE_URL:
     connect_args = {"check_same_thread": False}
+elif "mysql" in settings.DATABASE_URL and "pymysql" in settings.DATABASE_URL:
+    # MySQL with PyMySQL specific configuration
+    connect_args = {
+        "connect_timeout": 60,
+        "read_timeout": 30,
+        "write_timeout": 30
+    }
 
 # Create SQLAlchemy engine
 engine = create_engine(

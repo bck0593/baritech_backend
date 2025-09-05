@@ -10,6 +10,22 @@ from app.schemas.user import UserCreate, UserLogin, UserOut, Token
 router = APIRouter()
 
 
+@router.post("/test")
+def test_endpoint():
+    """テスト用エンドポイント - データベースを使用しない"""
+    return {"message": "Test endpoint working"}
+
+
+@router.post("/test-login")
+def test_login_endpoint(user_login: UserLogin):
+    """テスト用ログインエンドポイント - データベースを使用しない"""
+    return {
+        "message": "Login endpoint working", 
+        "email": user_login.email,
+        "password_received": bool(user_login.password)
+    }
+
+
 @router.post("/register", response_model=UserOut)
 def register_user(user_create: UserCreate, db: Session = Depends(get_db)):
     # Check if user already exists

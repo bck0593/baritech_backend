@@ -30,14 +30,29 @@ def check_duplicate_booking(db: Session, dog_id: str, booking_date: date, bookin
 
 def get_owner_by_user_id(db: Session, user_id: str) -> Owner:
     """
-    Get owner by user_id, raise 404 if not found
+    Get owner by user_id, create if not found
     """
     owner = db.query(Owner).filter(Owner.user_id == user_id).first()
     if not owner:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Owner profile not found for current user"
+        # Auto-create owner record if it doesn't exist
+        from app.models.user import User
+        user = db.query(User).filter(User.id == user_id).first()
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found"
+            )
+        
+        owner = Owner(
+            user_id=user_id,
+            name=user.name,
+            email=user.email,
+            phone=""  # デフォルト値
         )
+        db.add(owner)
+        db.commit()
+        db.refresh(owner)
+    
     return owner
 
 
