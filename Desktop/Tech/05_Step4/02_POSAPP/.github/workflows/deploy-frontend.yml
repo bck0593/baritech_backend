@@ -1,0 +1,27 @@
+﻿name: Deploy Frontend to Azure Web App
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Node を入れるのは任意だが、将来の検証や軽いタスクに備えて 20 を入れておく
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      # そのままリポジトリ直下を zip deploy（ビルドは Azure 側の Oryx に任せる）
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: app-002-gen10-step3-1-node-oshima29
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: .
